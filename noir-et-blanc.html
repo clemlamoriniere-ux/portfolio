@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noir & Blanc — Café Parisien</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --noir:   #111111;
+      --blanc:  #f9f6f1;
+      --beige:  #e8ddd0;
+      --beige2: #d4c5b0;
+      --gris:   #888880;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans:  'Inter', system-ui, sans-serif;
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--blanc);
+      color: var(--noir);
+      overflow-x: hidden;
+    }
+
+    /* Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--blanc); }
+    ::-webkit-scrollbar-thumb { background: var(--beige2); border-radius: 3px; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 4rem;
+      transition: background .4s var(--ease), box-shadow .4s var(--ease);
+    }
+    nav.scrolled {
+      background: rgba(249,246,241,.96);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 1px 0 var(--beige);
+    }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      letter-spacing: .04em;
+      text-decoration: none;
+      color: var(--noir);
+    }
+    .nav-links { display: flex; gap: 2.4rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: .82rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--noir);
+      opacity: .7;
+      transition: opacity .25s;
+    }
+    .nav-links a:hover { opacity: 1; }
+    .nav-cta {
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--noir);
+      color: var(--noir);
+      padding: .55rem 1.3rem;
+      transition: background .25s, color .25s;
+    }
+    .nav-cta:hover { background: var(--noir); color: var(--blanc); }
+
+    /* ── Hero ── */
+    #hero {
+      position: relative;
+      height: 100vh; min-height: 640px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      background: var(--noir);
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, #2a2318 0%, #111 70%);
+      opacity: 1;
+    }
+    /* Grain overlay */
+    .hero-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+      background-size: 160px;
+      opacity: .35;
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; padding: 0 1.5rem; }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: .72rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--beige2);
+      margin-bottom: 1.8rem;
+    }
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      color: var(--blanc);
+      line-height: 1.05;
+      font-weight: 400;
+    }
+    .hero-title em { font-style: italic; color: var(--beige); }
+    .hero-sub {
+      margin-top: 1.6rem;
+      font-size: .95rem;
+      font-weight: 300;
+      color: var(--beige2);
+      letter-spacing: .04em;
+      max-width: 440px;
+      margin-inline: auto;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      margin-top: 3rem;
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--blanc);
+      color: var(--noir);
+      text-decoration: none;
+      font-size: .78rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: .9rem 2.2rem;
+      transition: background .25s, color .25s, transform .2s;
+    }
+    .btn-primary:hover { background: var(--beige); transform: translateY(-1px); }
+    .btn-ghost {
+      display: inline-block;
+      border: 1px solid rgba(249,246,241,.35);
+      color: var(--blanc);
+      text-decoration: none;
+      font-size: .78rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: .9rem 2.2rem;
+      transition: border-color .25s, background .25s, transform .2s;
+    }
+    .btn-ghost:hover { border-color: var(--blanc); background: rgba(249,246,241,.08); transform: translateY(-1px); }
+
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .6rem;
+      color: var(--beige2); font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, var(--beige2), transparent);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0%   { transform: scaleY(0); transform-origin: top; }
+      50%  { transform: scaleY(1); transform-origin: top; }
+      51%  { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ── Section commons ── */
+    section { padding: 7rem 4rem; }
+    .section-label {
+      font-size: .68rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gris);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+    }
+    .divider {
+      width: 40px; height: 1px;
+      background: var(--beige2);
+      margin: 1.6rem 0;
+    }
+
+    /* ── About strip ── */
+    #about {
+      background: var(--beige);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+      padding: 7rem 8rem;
+    }
+    .about-img {
+      aspect-ratio: 4/5;
+      background: var(--beige2);
+      position: relative; overflow: hidden;
+    }
+    .about-img::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #c9bba8 0%, #a8957e 100%);
+    }
+    .about-img::after {
+      content: 'café';
+      position: absolute; bottom: 1.5rem; right: 1.5rem;
+      font-family: var(--font-serif);
+      font-size: 5rem;
+      color: rgba(255,255,255,.18);
+      line-height: 1;
+    }
+    .about-text p {
+      font-size: .97rem;
+      line-height: 1.85;
+      color: #3a3530;
+      margin-bottom: 1.4rem;
+      font-weight: 300;
+    }
+    .about-stats {
+      display: flex; gap: 3rem;
+      margin-top: 2.5rem;
+    }
+    .stat-num {
+      font-family: var(--font-serif);
+      font-size: 2.6rem;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gris);
+      margin-top: .3rem;
+    }
+
+    /* ── Menu ── */
+    #menu { background: var(--blanc); }
+    .menu-header { margin-bottom: 4rem; }
+    .menu-tabs {
+      display: flex; gap: 0;
+      margin-bottom: 3.5rem;
+      border-bottom: 1px solid var(--beige);
+    }
+    .tab-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: .78rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gris);
+      padding: .7rem 1.6rem .7rem 0;
+      margin-right: 1.6rem;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color .2s, border-color .2s;
+    }
+    .tab-btn.active, .tab-btn:hover { color: var(--noir); border-bottom-color: var(--noir); }
+
+    .menu-panel { display: none; }
+    .menu-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+
+    .menu-item {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--beige);
+      transition: background .2s;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item-info { flex: 1; }
+    .menu-item-name {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 400;
+    }
+    .menu-item-desc {
+      font-size: .8rem;
+      color: var(--gris);
+      margin-top: .25rem;
+      font-weight: 300;
+    }
+    .menu-item-price {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      margin-left: 2rem;
+      white-space: nowrap;
+    }
+    .menu-col { padding: 0 2rem 0 0; }
+    .menu-col:last-child { padding: 0 0 0 2rem; border-left: 1px solid var(--beige); }
+
+    /* ── Gallery ── */
+    #galerie { background: var(--noir); color: var(--blanc); }
+    #galerie .section-label { color: var(--beige2); }
+    #galerie .divider { background: #333; }
+    .gallery-grid {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: 240px 240px;
+      gap: 12px;
+    }
+    .gallery-item {
+      position: relative; overflow: hidden;
+      cursor: pointer;
+    }
+    .gallery-item:nth-child(1) { grid-column: 1 / 6; grid-row: 1 / 3; }
+    .gallery-item:nth-child(2) { grid-column: 6 / 9; grid-row: 1 / 2; }
+    .gallery-item:nth-child(3) { grid-column: 9 / 13; grid-row: 1 / 2; }
+    .gallery-item:nth-child(4) { grid-column: 6 / 9; grid-row: 2 / 3; }
+    .gallery-item:nth-child(5) { grid-column: 9 / 13; grid-row: 2 / 3; }
+
+    .gallery-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: .9rem;
+      color: rgba(255,255,255,.3);
+      transition: transform .5s var(--ease), filter .4s;
+    }
+    .gallery-item:hover .gallery-placeholder { transform: scale(1.04); }
+
+    .gallery-item:nth-child(1) .gallery-placeholder {
+      background: linear-gradient(160deg, #1e1810 0%, #2d2218 100%);
+      font-size: 1.2rem;
+    }
+    .gallery-item:nth-child(2) .gallery-placeholder { background: #1a1a16; }
+    .gallery-item:nth-child(3) .gallery-placeholder { background: #221e18; }
+    .gallery-item:nth-child(4) .gallery-placeholder { background: #181814; }
+    .gallery-item:nth-child(5) .gallery-placeholder { background: #1e1c16; }
+
+    .gallery-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0);
+      display: flex; align-items: flex-end;
+      padding: 1.5rem;
+      transition: background .35s;
+    }
+    .gallery-item:hover .gallery-overlay { background: rgba(0,0,0,.45); }
+    .gallery-caption {
+      font-size: .72rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--blanc);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .3s, transform .3s;
+    }
+    .gallery-item:hover .gallery-caption { opacity: 1; transform: none; }
+
+    /* ── Reservation ── */
+    #reservation {
+      background: var(--beige);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6rem; align-items: start;
+      padding: 7rem 8rem;
+    }
+    .resa-info .section-title { margin-bottom: 1rem; }
+    .resa-info p {
+      font-size: .95rem; line-height: 1.8; color: #4a453e;
+      font-weight: 300; margin-bottom: 2rem;
+    }
+    .resa-contact { display: flex; flex-direction: column; gap: .9rem; }
+    .contact-line {
+      display: flex; align-items: center; gap: .9rem;
+      font-size: .85rem; color: #4a453e;
+    }
+    .contact-icon {
+      width: 36px; height: 36px;
+      border: 1px solid var(--beige2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+    }
+
+    /* Form */
+    .resa-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: .45rem; }
+    .form-group label {
+      font-size: .7rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gris);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--blanc);
+      border: 1px solid var(--beige2);
+      padding: .85rem 1rem;
+      font-family: var(--font-sans);
+      font-size: .9rem;
+      color: var(--noir);
+      outline: none;
+      transition: border-color .2s;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--noir); }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+    .form-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+    .btn-submit {
+      background: var(--noir);
+      color: var(--blanc);
+      border: none; cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: .78rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 1.1rem 2.4rem;
+      margin-top: .5rem;
+      align-self: flex-start;
+      transition: background .25s, transform .2s;
+    }
+    .btn-submit:hover { background: #333; transform: translateY(-1px); }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 2.5rem;
+      background: var(--blanc);
+    }
+    .form-success .check { font-size: 2rem; margin-bottom: 1rem; }
+    .form-success h3 { font-family: var(--font-serif); font-size: 1.4rem; margin-bottom: .5rem; }
+    .form-success p { font-size: .9rem; color: var(--gris); }
+
+    /* ── Horaires band ── */
+    #horaires {
+      background: var(--noir);
+      color: var(--blanc);
+      padding: 4rem 8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .hours-block { text-align: center; }
+    .hours-days {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--beige2);
+      margin-bottom: .5rem;
+    }
+    .hours-time {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+    }
+    .hours-sep { width: 1px; height: 60px; background: #333; }
+    .address-block { text-align: right; }
+    .address-label {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--beige2);
+      margin-bottom: .5rem;
+    }
+    .address-text {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--noir);
+      border-top: 1px solid #1e1e1e;
+      padding: 2.5rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #555;
+      font-size: .75rem;
+      letter-spacing: .06em;
+    }
+    .footer-logo {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      color: var(--blanc);
+      opacity: .6;
+    }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a {
+      color: #555; text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--blanc); }
+
+    /* ── Animations on scroll ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 2rem; }
+      .nav-links { display: none; }
+      section { padding: 5rem 2rem; }
+      #about, #reservation { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 2rem; }
+      .menu-panel.active { grid-template-columns: 1fr; }
+      .menu-col:last-child { border-left: none; border-top: 1px solid var(--beige); padding: 0; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, 180px); }
+      .gallery-item:nth-child(n) { grid-column: auto; grid-row: auto; }
+      #horaires { padding: 3rem 2rem; }
+      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">Noir & Blanc</a>
+    <ul class="nav-links">
+      <li><a href="#about">Histoire</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#galerie">Galerie</a></li>
+    </ul>
+    <a href="#reservation" class="nav-cta">Réserver</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <span class="hero-eyebrow">Depuis 1987 — Paris, Marais</span>
+      <h1 class="hero-title">Noir<br/>&amp; <em>Blanc</em></h1>
+      <p class="hero-sub">Un café parisien où chaque tasse est un rituel, chaque instant une pause.</p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn-primary">Découvrir le menu</a>
+        <a href="#reservation" class="btn-ghost">Réserver une table</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
+      <span>Défiler</span>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section id="about">
+    <div class="about-img"></div>
+    <div class="about-text">
+      <p class="section-label reveal">Notre histoire</p>
+      <h2 class="section-title reveal reveal-delay-1">L'art du café,<br/>élevé au rang<br/><em style="font-family:var(--font-serif);font-style:italic">de tradition.</em></h2>
+      <div class="divider reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2">Fondé en 1987 au cœur du Marais, Noir & Blanc est né d'une obsession simple : servir un café parfait dans un cadre qui invite à la lenteur. Nos grains sont sélectionnés chaque saison auprès de producteurs engagés.</p>
+      <p class="reveal reveal-delay-3">Ici, le temps s'étire. Les conversations se prolongent. La lumière du matin filtre entre les pierres anciennes.</p>
+      <div class="about-stats reveal reveal-delay-4">
+        <div>
+          <div class="stat-num">38</div>
+          <div class="stat-label">Ans d'histoire</div>
+        </div>
+        <div>
+          <div class="stat-num">12</div>
+          <div class="stat-label">Origines de café</div>
+        </div>
+        <div>
+          <div class="stat-num">4</div>
+          <div class="stat-label">Tables en terrasse</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MENU ── -->
+  <section id="menu">
+    <div class="menu-header">
+      <p class="section-label reveal">La carte</p>
+      <h2 class="section-title reveal reveal-delay-1">Ce que nous<br/>vous proposons</h2>
+      <div class="divider reveal reveal-delay-2"></div>
+    </div>
+    <div class="menu-tabs reveal">
+      <button class="tab-btn active" data-tab="cafes">Cafés</button>
+      <button class="tab-btn" data-tab="patisseries">Pâtisseries</button>
+      <button class="tab-btn" data-tab="dejeuner">Déjeuner</button>
+    </div>
+
+    <div class="menu-panel active" id="tab-cafes">
+      <div class="menu-col">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Espresso</div>
+            <div class="menu-item-desc">Blend maison, torréfaction claire</div>
+          </div>
+          <div class="menu-item-price">2,80 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Cortado</div>
+            <div class="menu-item-desc">Espresso allongé, mousse de lait soyeuse</div>
+          </div>
+          <div class="menu-item-price">3,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Flat White</div>
+            <div class="menu-item-desc">Double ristretto, lait micro-moussé</div>
+          </div>
+          <div class="menu-item-price">4,20 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Café Filtre</div>
+            <div class="menu-item-desc">Éthiopie Yirgacheffe, notes florales</div>
+          </div>
+          <div class="menu-item-price">3,80 €</div>
+        </div>
+      </div>
+      <div class="menu-col">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Latte Noisette</div>
+            <div class="menu-item-desc">Espresso, sirop artisanal, lait d'avoine</div>
+          </div>
+          <div class="menu-item-price">5,00 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Cold Brew</div>
+            <div class="menu-item-desc">Infusion 18h, servi sur glace pilée</div>
+          </div>
+          <div class="menu-item-price">4,80 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Cappuccino</div>
+            <div class="menu-item-desc">Classique, art latte sur demande</div>
+          </div>
+          <div class="menu-item-price">3,90 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Matcha Latte</div>
+            <div class="menu-item-desc">Matcha cérémonie, lait de coco</div>
+          </div>
+          <div class="menu-item-price">5,20 €</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-panel" id="tab-patisseries">
+      <div class="menu-col">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Croissant au beurre</div>
+            <div class="menu-item-desc">Feuilletage pur beurre, farine T65</div>
+          </div>
+          <div class="menu-item-price">2,20 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Kouign-Amann</div>
+            <div class="menu-item-desc">Breton, caramélisé minute</div>
+          </div>
+          <div class="menu-item-price">3,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Financier Pistache</div>
+            <div class="menu-item-desc">Beurre noisette, pistache de Sicile</div>
+          </div>
+          <div class="menu-item-price">3,20 €</div>
+        </div>
+      </div>
+      <div class="menu-col">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Tarte Citron</div>
+            <div class="menu-item-desc">Crème yuzu, meringue soufflée</div>
+          </div>
+          <div class="menu-item-price">5,80 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Éclair Café</div>
+            <div class="menu-item-desc">Ganache espresso, glaçage satiné</div>
+          </div>
+          <div class="menu-item-price">4,60 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Banana Bread</div>
+            <div class="menu-item-desc">Sans gluten, noix de pécan</div>
+          </div>
+          <div class="menu-item-price">4,00 €</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-panel" id="tab-dejeuner">
+      <div class="menu-col">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Tartine Avocat</div>
+            <div class="menu-item-desc">Pain de campagne, œuf poché, za'atar</div>
+          </div>
+          <div class="menu-item-price">12,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Salade Niçoise</div>
+            <div class="menu-item-desc">Thon, anchois, légumes du marché</div>
+          </div>
+          <div class="menu-item-price">14,00 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Soupe du jour</div>
+            <div class="menu-item-desc">Recette du chef, pain grillé</div>
+          </div>
+          <div class="menu-item-price">8,50 €</div>
+        </div>
+      </div>
+      <div class="menu-col">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Croque-Monsieur</div>
+            <div class="menu-item-desc">Jambon fermier, comté 18 mois</div>
+          </div>
+          <div class="menu-item-price">11,00 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Bowl Quinoa</div>
+            <div class="menu-item-desc">Légumes rôtis, tahini, graines</div>
+          </div>
+          <div class="menu-item-price">13,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Formule Midi</div>
+            <div class="menu-item-desc">Plat + café + dessert du jour</div>
+          </div>
+          <div class="menu-item-price">18,00 €</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GALERIE ── -->
+  <section id="galerie">
+    <p class="section-label reveal">En images</p>
+    <h2 class="section-title reveal reveal-delay-1">L'atmosphère<br/><em style="font-family:var(--font-serif);font-style:italic">Noir & Blanc</em></h2>
+    <div class="gallery-grid reveal reveal-delay-2">
+      <div class="gallery-item">
+        <div class="gallery-placeholder">L'intérieur</div>
+        <div class="gallery-overlay"><span class="gallery-caption">Salle principale</span></div>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-placeholder">Le bar</div>
+        <div class="gallery-overlay"><span class="gallery-caption">Le comptoir</span></div>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-placeholder">Les grains</div>
+        <div class="gallery-overlay"><span class="gallery-caption">Sélection single-origin</span></div>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-placeholder">La terrasse</div>
+        <div class="gallery-overlay"><span class="gallery-caption">Terrasse ensoleillée</span></div>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-placeholder">Les pâtisseries</div>
+        <div class="gallery-overlay"><span class="gallery-caption">Vitrine du jour</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RESERVATION ── -->
+  <section id="reservation">
+    <div class="resa-info">
+      <p class="section-label reveal">Réservation</p>
+      <h2 class="section-title reveal reveal-delay-1">Réservez<br/>votre table</h2>
+      <div class="divider reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2">Les réservations sont ouvertes jusqu'à 24h à l'avance. Pour les groupes de plus de 6 personnes, contactez-nous directement par téléphone.</p>
+      <div class="resa-contact reveal reveal-delay-3">
+        <div class="contact-line">
+          <div class="contact-icon">✆</div>
+          <span>+33 1 42 78 30 12</span>
+        </div>
+        <div class="contact-line">
+          <div class="contact-icon">@</div>
+          <span>bonjour@noiretblanc.fr</span>
+        </div>
+        <div class="contact-line">
+          <div class="contact-icon">⌖</div>
+          <span>14 rue de Bretagne, 75003 Paris</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <form class="resa-form reveal reveal-delay-2" id="resa-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" placeholder="Marie" required />
+          </div>
+          <div class="form-group">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" placeholder="Dupont" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="marie@exemple.fr" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" required />
+          </div>
+          <div class="form-group">
+            <label for="heure">Heure</label>
+            <select id="heure" required>
+              <option value="">Choisir…</option>
+              <option>08:00</option><option>08:30</option>
+              <option>09:00</option><option>09:30</option>
+              <option>10:00</option><option>10:30</option>
+              <option>11:00</option><option>11:30</option>
+              <option>12:00</option><option>12:30</option>
+              <option>13:00</option><option>13:30</option>
+              <option>14:00</option><option>14:30</option>
+              <option>18:00</option><option>18:30</option>
+              <option>19:00</option><option>19:30</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="couverts">Nombre de personnes</label>
+          <select id="couverts" required>
+            <option value="">Choisir…</option>
+            <option>1 personne</option>
+            <option>2 personnes</option>
+            <option>3 personnes</option>
+            <option>4 personnes</option>
+            <option>5 personnes</option>
+            <option>6 personnes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message (optionnel)</label>
+          <textarea id="message" placeholder="Allergie, occasion spéciale…"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Confirmer la réservation</button>
+      </form>
+      <div class="form-success" id="form-success">
+        <div class="check">✓</div>
+        <h3>Réservation confirmée</h3>
+        <p>Nous avons bien reçu votre demande. Un email de confirmation vous sera envoyé sous peu.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HORAIRES ── -->
+  <div id="horaires">
+    <div class="hours-block">
+      <div class="hours-days">Lundi – Vendredi</div>
+      <div class="hours-time">07h30 – 20h00</div>
+    </div>
+    <div class="hours-sep"></div>
+    <div class="hours-block">
+      <div class="hours-days">Samedi</div>
+      <div class="hours-time">08h00 – 21h00</div>
+    </div>
+    <div class="hours-sep"></div>
+    <div class="hours-block">
+      <div class="hours-days">Dimanche</div>
+      <div class="hours-time">09h00 – 18h00</div>
+    </div>
+    <div class="hours-sep"></div>
+    <div class="address-block">
+      <div class="address-label">Adresse</div>
+      <div class="address-text">14 rue de Bretagne<br/>75003 Paris — Marais</div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <span class="footer-logo">Noir & Blanc</span>
+    <div class="footer-links">
+      <a href="#menu">Menu</a>
+      <a href="#galerie">Galerie</a>
+      <a href="#reservation">Réservation</a>
+    </div>
+    <span>© 2026 Noir & Blanc. Tous droits réservés.</span>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Menu tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Reservation form
+    const form = document.getElementById('resa-form');
+    const success = document.getElementById('form-success');
+
+    // Set min date to today
+    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fields = form.querySelectorAll('[required]');
+      let valid = true;
+      fields.forEach(f => {
+        f.style.borderColor = '';
+        if (!f.value.trim()) {
+          f.style.borderColor = '#c0392b';
+          valid = false;
+        }
+      });
+      if (!valid) return;
+
+      // Simulate async submit
+      const btn = form.querySelector('.btn-submit');
+      btn.textContent = 'Envoi en cours…';
+      btn.disabled = true;
+      setTimeout(() => {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      }, 1000);
+    });
+
+    // Smooth active nav link on scroll
+    const sections = document.querySelectorAll('section[id], div[id="horaires"]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.opacity = a.getAttribute('href') === '#' + current ? '1' : '.7';
+      });
+    }, { passive: true });
+  </script>
+</body>
+</html>
